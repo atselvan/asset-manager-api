@@ -1,0 +1,1 @@
+create type category as enum ('smart-phone');

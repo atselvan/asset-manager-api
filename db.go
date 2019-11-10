@@ -1,40 +1,84 @@
 package main
 
 import (
+	"database/sql"
+	"fmt"
 	_ "github.com/lib/pq"
 	"os"
 )
 
+// DBConn database connection details
 type DbConn struct {
 	hostname string
-	port string
-	name string
+	port     string
+	name     string
 	username string
 	password string
 }
 
 // getConn gets the database connection details from environment variables
 // If the documented environment variables are not set the method return default values
-func (dc *DbConn) GetConn() DbConn {
-	// set dc hostname
-	if dc.hostname = os.Getenv("DB_HOSTNAME"); dc.hostname == "" {
-		dc.hostname = "192.168.2.75"
+func (dbConn *DbConn) GetConn() DbConn {
+	// set db hostname
+	if dbConn.hostname = os.Getenv("DB_HOSTNAME"); dbConn.hostname == "" {
+		dbConn.hostname = "192.168.2.75"
 	}
-	// set dn port
-	if dc.port = os.Getenv("DB_PORT"); dc.port == "" {
-		dc.port = "5432"
+	// set db port
+	if dbConn.port = os.Getenv("DB_PORT"); dbConn.port == "" {
+		dbConn.port = "5432"
 	}
-	// set dc name
-	if dc.name = os.Getenv("DB_NAME"); dc.name == "" {
-		dc.name = "assets"
+	// set db name
+	if dbConn.name = os.Getenv("DB_NAME"); dbConn.name == "" {
+		dbConn.name = "assets"
 	}
-	// set dc username
-	if dc.username = os.Getenv("DB_USERNAME"); dc.username == "" {
-		dc.username = "postgres"
+	// set db username
+	if dbConn.username = os.Getenv("DB_USERNAME"); dbConn.username == "" {
+		dbConn.username = "postgres"
 	}
-	// set dc password
-	if dc.password = os.Getenv("DB_PASSWORD"); dc.password == "" {
-		dc.password = "postgres"
+	// set db password
+	if dbConn.password = os.Getenv("DB_PASSWORD"); dbConn.password == "" {
+		dbConn.password = "postgres"
 	}
-	return *dc
+	return *dbConn
+}
+
+// GetDBConnString gets the database connection details and retuns the database connection string
+func (dbConn *DbConn) GetConnString() string {
+	*dbConn = dbConn.GetConn()
+	return fmt.Sprintf("host=%s port=%s dbname=%s user=%s password=%s sslmode=disable", dbConn.hostname, dbConn.port, dbConn.name, dbConn.username, dbConn.password)
+}
+
+// Connect establishes a connection with the database and validates the connnection
+func (dbConn *DbConn) Connect() (*sql.DB, error) {
+	db, err := sql.Open("postgres", dbConn.GetConnString())
+	if err != nil {
+		fmt.Println(err)
+	}
+	err = db.Ping()
+	if err != nil {
+		fmt.Println(err)
+	}
+	return db, nil
+}
+
+// Close closes the connection with the database
+func (dbConn *DbConn) Close(db *sql.DB) error {
+	return db.Close()
+}
+
+// Exec executes a query on the database
+func (dbConn *DbConn) Exec(query string) error {
+	db, err := dbConn.Connect()
+	if err != nil {
+		return err
+	}
+	_, err = db.Exec(query)
+	if err != nil {
+		return err
+	}
+	err = dbConn.Close(db)
+	if err != nil {
+		return err
+	}
+	return nil
 }

@@ -37,14 +37,6 @@ func TestDbConn_GetConn_Default(t *testing.T) {
 	if dbConn.password != defaultPassword {
 		t.Errorf("Database password was incorrect, got: %s, want: %s", dbConn.password, defaultPassword)
 	}
-	_ = os.Setenv("DB_HOSTNAME", "example.com")
-
-	fmt.Println(os.Getenv("DB_HOSTNAME"))
-
-	dbConn = dbConn.GetConn()
-	if dbConn.hostname != "example.com" {
-		t.Errorf("Hostname was incorrect, got: %s, want: %s", dbConn.hostname, "example.com")
-	}
 }
 
 func TestDbConn_GetConn_Env(t *testing.T) {

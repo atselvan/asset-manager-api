@@ -5,14 +5,14 @@ import (
 	"fmt"
 )
 
-type enum struct {
+type Enum struct {
 	name  string
 	value string
 }
 
 // Exists checks if a enum type already exists or not in the database
 // The method returns a boolean value and an error depending on the result
-func (e *enum) Exists() (bool, error) {
+func (e *Enum) Exists() (bool, error) {
 	var dbConn DbConn
 	if e.name == "" {
 		return false, errors.New("enum name cannot be empty")
@@ -27,7 +27,7 @@ func (e *enum) Exists() (bool, error) {
 
 // Get returns a list of enum type values
 // The method returns the values of a enum or an error
-func (e *enum) Get() ([]string, error) {
+func (e *Enum) Get() ([]string, error) {
 	var (
 		dbConn DbConn
 		values []string
@@ -53,7 +53,7 @@ func (e *enum) Get() ([]string, error) {
 
 // Add adds a new enum type in the database
 // The method returns an error if something goes wrong
-func (e *enum) Add() error {
+func (e *Enum) Add() error {
 	var dbConn DbConn
 	if e.name == "" {
 		return errors.New("enum name cannot be empty")
@@ -63,7 +63,7 @@ func (e *enum) Add() error {
 
 // Add updates the enum type in the database
 // The method returns an error if something goes wrong
-func (e *enum) Update() error {
+func (e *Enum) Update() error {
 	var dbConn DbConn
 	if e.name == "" || e.value == "" {
 		return errors.New("enum name or value cannot be empty")
@@ -73,7 +73,7 @@ func (e *enum) Update() error {
 
 // Delete removes the enum type from the database
 // The method returns an error if something goes wrong
-func (e *enum) Delete() error {
+func (e *Enum) Delete() error {
 	var dbConn DbConn
 	if e.name == "" {
 		return errors.New("enum name cannot be empty")

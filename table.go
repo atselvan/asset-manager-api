@@ -5,19 +5,19 @@ import (
 	"fmt"
 )
 
-type table struct {
+type Table struct {
 	Name    string
-	Columns []tableColumn
+	Columns []TableColumn
 }
 
-type tableColumn struct {
+type TableColumn struct {
 	Name        string
 	DataType    string
 	constraints []string
 }
 
 // GetQuery creates and returns a SQL table query which would be used to create a table in the database
-func (t *table) GetQuery() string {
+func (t *Table) GetQuery() string {
 	var query string
 	query = fmt.Sprintf("CREATE TABLE %s (\n", t.Name)
 	for i, c := range t.Columns {
@@ -39,7 +39,7 @@ func (t *table) GetQuery() string {
 
 // Create creates a new table in the database
 // The method returns an error if something goes wrong
-func (t *table) Create() error {
+func (t *Table) Create() error {
 	var dbConn DbConn
 	err := t.ValidateTableDefinition()
 	if err != nil {
@@ -49,7 +49,7 @@ func (t *table) Create() error {
 }
 
 // ValidateTableDefinition validates the table definition before creation of the table in the database
-func (t *table) ValidateTableDefinition() error {
+func (t *Table) ValidateTableDefinition() error {
 	if t.Name == "" {
 		return errors.New("table name cannot be empty")
 	}
@@ -66,7 +66,7 @@ func (t *table) ValidateTableDefinition() error {
 
 // Exists checks if a table already exists
 // The method returns a boolean value or an error if something goes wrong
-func (t *table) Exists() (bool, error) {
+func (t *Table) Exists() (bool, error) {
 	err := t.ValidateTableDefinition()
 	if err != nil {
 		return false, err
@@ -100,7 +100,7 @@ func (t *table) Exists() (bool, error) {
 
 // Delete drops the table from tha database
 // The method returns an error if something goes wrong
-func (t *table) Delete() error {
+func (t *Table) Delete() error {
 	var dbConn DbConn
 	if t.Name == "" {
 		return errors.New("table name cannot be empty")

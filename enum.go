@@ -51,9 +51,9 @@ func (e *Enum) Get() ([]string, error) {
 	return values, err
 }
 
-// Add adds a new enum type in the database
+// Create creates a new enum type in the database
 // The method returns an error if something goes wrong
-func (e *Enum) Add() error {
+func (e *Enum) Create() error {
 	var dbConn DbConn
 	if e.name == "" {
 		return errors.New("enum name cannot be empty")

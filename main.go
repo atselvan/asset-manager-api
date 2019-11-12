@@ -3,25 +3,7 @@ package main
 import "fmt"
 
 func init() {
-	enum := enum{
-		name:  categoryEnumTypeName,
-		value: "device",
-	}
-	err := enum.Add()
 
-	err = enum.Update()
-
-	enum.value = "game"
-
-	err = enum.Update()
-
-	fmt.Println("Add : ", err)
-
-	b, e := enum.Exists()
-	fmt.Println("Exists : ", b, e)
-
-	v, _ := enum.Get()
-	fmt.Println(v)
 }
 
 func main() {

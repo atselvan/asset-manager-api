@@ -3,7 +3,9 @@ package main
 import "fmt"
 
 func init() {
-
+	var a Asset
+	err := a.Init()
+	fmt.Println(err)
 }
 
 func main() {
@@ -13,8 +15,8 @@ func main() {
 
 	a := Asset{
 		Name:     "MacBook Pro",
-		Category: "devices",
-		Kind:     "laptop",
+		Category: "device",
+		Ctype:    "laptop",
 		Model:    "MacBook Pro 15-inch SpaceGrey",
 		Serial:   "C02VC1TBHTD511",
 		Brand:    "Apple",
@@ -24,5 +26,5 @@ func main() {
 		Status:   "owned",
 	}
 
-	fmt.Println(a)
+	fmt.Println(a.Add())
 }

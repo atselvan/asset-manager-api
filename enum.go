@@ -6,8 +6,8 @@ import (
 )
 
 type Enum struct {
-	name  string
-	value string
+	name   string
+	values StringSlice
 }
 
 // Exists checks if a enum type already exists or not in the database
@@ -27,28 +27,25 @@ func (e *Enum) Exists() (bool, error) {
 
 // Get returns a list of enum type values
 // The method returns the values of a enum or an error
-func (e *Enum) Get() ([]string, error) {
-	var (
-		dbConn DbConn
-		values []string
-	)
+func (e *Enum) Get() error {
+	var dbConn DbConn
 	db, err := dbConn.Connect()
 	if err != nil {
-		return nil, err
+		return err
 	}
 	rows, err := db.Query(fmt.Sprintf("select unnest (enum_range(NULL::%s));", e.name))
 	if err != nil {
-		return nil, err
+		return err
 	}
 	for rows.Next() {
 		var value string
 		err = rows.Scan(&value)
 		if err != nil {
-			return nil, err
+			return err
 		}
-		values = append(values, value)
+		e.values = append(e.values, value)
 	}
-	return values, err
+	return err
 }
 
 // Create creates a new enum type in the database
@@ -65,10 +62,10 @@ func (e *Enum) Create() error {
 // The method returns an error if something goes wrong
 func (e *Enum) Update() error {
 	var dbConn DbConn
-	if e.name == "" || e.value == "" {
+	if e.name == "" || len(e.values) < 1 {
 		return errors.New("enum name or value cannot be empty")
 	}
-	return dbConn.Exec(fmt.Sprintf("alter type %s add value '%s';", e.name, e.value))
+	return dbConn.Exec(fmt.Sprintf("alter type %s add value '%s';", e.name, e.values[0]))
 }
 
 // Delete removes the enum type from the database

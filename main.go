@@ -1,17 +1,21 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"github.com/gorilla/mux"
+	"log"
+	"net/http"
+)
 
 func init() {
-	var a Asset
-	err := a.Init()
-	fmt.Println(err)
+	//var a Asset
+	//err := a.Init()
+	//fmt.Println(err)
 }
 
 func main() {
-	//r := mux.NewRouter()
-	//r.HandleFunc("/", homeHandler)
-	//log.Fatal(http.ListenAndServe(":8080", r))
+	r := mux.NewRouter()
+	r.HandleFunc("/category", categoryHandler).Methods("GET", "POST")
 
 	a := Asset{
 		Name:     "MacBook Pro",
@@ -27,4 +31,6 @@ func main() {
 	}
 
 	fmt.Println(a.Add())
+
+	log.Fatal(http.ListenAndServe(":8080", r))
 }

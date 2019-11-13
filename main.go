@@ -15,7 +15,9 @@ func init() {
 
 func main() {
 	r := mux.NewRouter()
-	r.HandleFunc("/category", categoryHandler).Methods("GET", "POST")
+	r.HandleFunc("/category", categoryHandler).PathPrefix("/api/v1").Methods("GET", "POST")
+	r.PathPrefix("/api/v1").Path("/type").HandlerFunc(typeHandler).Methods("GET", "POST")
+	r.PathPrefix("/api/v1").Path("/brand").HandlerFunc(brandHandler).Methods("GET", "POST")
 
 	a := Asset{
 		Name:     "MacBook Pro",

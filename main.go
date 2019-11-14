@@ -14,6 +14,9 @@ func init() {
 }
 
 func main() {
+
+	Logger{Message: "Starting the server"}.Info()
+
 	r := mux.NewRouter()
 	r.HandleFunc("/category", categoryHandler).PathPrefix("/api/v1").Methods("GET", "POST")
 	r.PathPrefix("/api/v1").Path("/type").HandlerFunc(typeHandler).Methods("GET", "POST")

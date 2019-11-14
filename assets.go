@@ -24,15 +24,19 @@ func (a *Asset) Init() error {
 		t Table
 	)
 
+	Logger{Message: appInitStr}.Info()
+
 	e.name = categoryEnumTypeName
 	isExists, err := e.Exists()
 	if !isExists {
 		err = e.Create()
 		if err != nil {
 			return err
+		} else {
+			Logger{Message: fmt.Sprintf(enumCreatedStr, categoryEnumName)}.Info()
 		}
 	} else {
-		fmt.Println("Enum category already exists")
+		Logger{Message: fmt.Sprintf(enumExistsStr, categoryEnumName)}.Info()
 	}
 
 	e.name = typeEnumTypeName
@@ -41,9 +45,11 @@ func (a *Asset) Init() error {
 		err = e.Create()
 		if err != nil {
 			return err
+		} else {
+			Logger{Message: fmt.Sprintf(enumCreatedStr, typeEnumName)}.Info()
 		}
 	} else {
-		fmt.Println("Enum type already exists")
+		Logger{Message: fmt.Sprintf(enumExistsStr, typeEnumName)}.Info()
 	}
 
 	e.name = brandEnumTypeName
@@ -52,26 +58,12 @@ func (a *Asset) Init() error {
 		err = e.Create()
 		if err != nil {
 			return err
+		} else {
+			Logger{Message: fmt.Sprintf(enumCreatedStr, brandEnumName)}.Info()
 		}
 	} else {
-		fmt.Println("Enum brand already exists")
+		Logger{Message: fmt.Sprintf(enumExistsStr, brandEnumName)}.Info()
 	}
-
-	/*
-		CREATE TABLE assets (
-		        id                      SERIAL          PRIMARY KEY     NOT NULL,
-		        name                    VARCHAR(100)    NOT NULL,
-		        category                VARCHAR(20)     NOT NULL,
-		        type                    VARCHAR(20)     NOT NULL,
-		        model                   VARCHAR(20)     NOT NULL,
-		        serial                  VARCHAR(20)     UNIQUE     NOT NULL,
-		        brand                   VARCHAR(20)     NOT NULL,
-		        manufactured_year       INT             NOT NULL,
-		        purchased_date          DATE,
-		        price                   FLOAT,
-		        status                  VARCHAR(10)     NOT NULL
-		);
-	*/
 
 	t = Table{
 		Name: assetsTableName,
@@ -116,6 +108,7 @@ func (a *Asset) Init() error {
 				Name:     "serial",
 				DataType: "varchar(50)",
 				constraints: []string{
+					"unique",
 					"not null",
 				},
 			},
@@ -156,10 +149,14 @@ func (a *Asset) Init() error {
 		err = t.Create()
 		if err != nil {
 			return err
+		} else {
+			Logger{Message: fmt.Sprintf(tableCreatedStr, assetsTableName)}.Info()
 		}
 	} else {
-		fmt.Println("assets table already exists")
+		Logger{Message: fmt.Sprintf(tableExistsStr, assetsTableName)}.Info()
 	}
+
+	Logger{Message: appInitCompletedStr}.Info()
 
 	return nil
 }

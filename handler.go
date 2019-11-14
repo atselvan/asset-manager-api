@@ -6,7 +6,6 @@ import (
 )
 
 // TODO : Redesign HTTP response and Logger utils
-// TODO: Added logging to init steps
 // TODO: Improve Handler info msg. eg: 'Apple1' is added to asset_brand
 
 func homeHandler(w http.ResponseWriter, r *http.Request) {

@@ -8,9 +8,11 @@ import (
 )
 
 func init() {
-	//var a Asset
-	//err := a.Init()
-	//fmt.Println(err)
+	var a Asset
+	err := a.Init()
+	if err != nil {
+		Logger{Message: appInitErrorStr}.Error()
+	}
 }
 
 func main() {

@@ -1,15 +1,24 @@
 package main
 
-const (
-	assetsTableName      = "assets"
-	categoryEnumTypeName = "asset_category"
-	typeEnumTypeName     = "asset_type"
-	brandEnumTypeName    = "asset_brand"
+import "fmt"
 
-	categoryValueRequiredStr  = "category value is a required parameter"
-	categoryValuesRequiredStr = "at least one category value is a required"
-	typeValueRequiredStr      = "type value is a required parameter"
-	typeValuesRequiredStr     = "at least one category value is a required"
-	brandValueRequiredStr     = "brand value is a required parameter"
-	brandValuesRequiredStr    = "at least one category value is a required"
+const (
+	assetsTableName     = "assets"
+	categoryEnumName    = "category"
+	typeEnumName        = "type"
+	brandEnumName       = "brand"
+	appInitStr          = "Begin application initialisation"
+	appInitCompletedStr = "Application initialisation Completed"
+	appInitErrorStr     = "There was an error in the initialisation"
+	enumNameFormat      = "%s_%s"
+	enumExistsStr       = "Enum '%s' already exists"
+	enumCreatedStr      = "Enum '%s' is created in the database"
+	tableExistsStr      = "Table '%s' already exists"
+	tableCreatedStr     = "Table '%s' is created"
+)
+
+var (
+	categoryEnumTypeName = fmt.Sprintf(enumNameFormat, assetsTableName, categoryEnumName)
+	typeEnumTypeName     = fmt.Sprintf(enumNameFormat, assetsTableName, typeEnumName)
+	brandEnumTypeName    = fmt.Sprintf(enumNameFormat, assetsTableName, brandEnumName)
 )

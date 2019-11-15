@@ -16,6 +16,8 @@ type DbConn struct {
 	password string
 }
 
+// TODO : Move database methods into its own library
+
 // getConn gets the database connection details from environment variables
 // If the documented environment variables are not set the method return default values
 func (dbConn *DbConn) GetConn() DbConn {

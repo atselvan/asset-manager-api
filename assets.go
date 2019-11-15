@@ -17,7 +17,11 @@ type Asset struct {
 	Status   string `json:"status"`
 }
 
-// Init
+// TODO : Return custom errors? Log Errors here?
+// TODO : Close DB connection
+
+// Init initialises the database
+// The method adds the required enums and tables and returns a error if any
 func (a *Asset) Init() error {
 	var (
 		e Enum
@@ -162,6 +166,31 @@ func (a *Asset) Init() error {
 }
 
 // GetAssets
+func (a *Asset) Get() ([]Asset, error) {
+	var (
+		dbConn DbConn
+		assets []Asset
+	)
+	db, err := dbConn.Connect()
+	defer dbConn.Close(db)
+	if err != nil {
+		return nil, err
+	}
+	rows, err := db.Query(fmt.Sprintf("Select * from %s", assetsTableName))
+	if err != nil {
+		return nil, err
+	}
+	for rows.Next() {
+		var a Asset
+		err = rows.Scan(&a.Id, &a.Name, &a.Category, &a.Ctype, &a.Model, &a.Serial, &a.Brand, &a.MnfYear, &a.PDate, &a.Price, &a.Status)
+		if err != nil {
+			return nil, err
+		}
+		fmt.Println(a)
+		assets = append(assets, a)
+	}
+	return assets, nil
+}
 
 // GetAssetByID
 
@@ -170,6 +199,7 @@ func (a *Asset) Init() error {
 // GetAssetByCategory
 
 // AddAsset
+// TODO : Check if a asset already exists
 func (a *Asset) Add() (string, error) {
 	var dbConn DbConn
 	db, err := dbConn.Connect()

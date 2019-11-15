@@ -7,6 +7,7 @@ import (
 
 // TODO : Redesign HTTP response and Logger utils
 // TODO: Improve Handler info msg. eg: 'Apple1' is added to asset_brand
+// TODO: Update home handler + add page not found handler
 
 func homeHandler(w http.ResponseWriter, r *http.Request) {
 
@@ -90,6 +91,45 @@ func enumPostHandler(w http.ResponseWriter, r *http.Request, enumName string) {
 	}
 }
 
-func assetsHandeler(w http.ResponseWriter, r *http.Request) {
+func assetsHandler(w http.ResponseWriter, r *http.Request) {
 
+	switch r.Method {
+
+	case "GET":
+		var a Asset
+		assets, err := a.Get()
+		if err != nil {
+			writeErrorResp(r, w, internalServerErrorStatusCode, err)
+		} else {
+			fmt.Println(assets)
+			fmt.Println(len(assets))
+			if len(assets) < 1 {
+				writeHTTPResp(r, w, notFoundStatusCode, Response{Message: "No Assets were found"})
+			} else {
+				writeHTTPResp(r, w, successStatusCode, &assets)
+			}
+		}
+
+	case "POST":
+		a := Asset{
+			Name:     "MacBook Pro",
+			Category: "device",
+			Ctype:    "laptop",
+			Model:    "MacBook Pro 15-inch SpaceGrey",
+			Serial:   "C02VC1TBHTD51",
+			Brand:    "Apple",
+			MnfYear:  "2017",
+			PDate:    "10/31/2017",
+			Price:    "2799",
+			Status:   "owned",
+		}
+		fmt.Println(a)
+
+		id, err := a.Add()
+		if err != nil {
+			writeErrorResp(r, w, internalServerErrorStatusCode, err)
+		} else {
+			writeHTTPResp(r, w, successStatusCode, Response{Message: fmt.Sprintf("Asset information is added with id '%s'", id)})
+		}
+	}
 }

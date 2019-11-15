@@ -89,16 +89,19 @@ func writeHTTPResp(r *http.Request, w http.ResponseWriter, responseCode int, res
 	}
 }
 
+// TODO : Change "responseCode int" to statusCode int
 func writeInfoResp(r *http.Request, w http.ResponseWriter, responseCode int, response string) {
 	writeHTTPResp(r, w, responseCode, Response{response})
 	Logger{r, response}.Info()
 }
 
+// TODO : Change "successCode int" to statusCode int
 func writeWarnResp(r *http.Request, w http.ResponseWriter, successCode int, response string) {
 	writeHTTPResp(r, w, successCode, Response{response})
 	Logger{r, response}.Warn()
 }
 
+// TODO : Change "s int" to statusCode int
 func writeErrorResp(r *http.Request, w http.ResponseWriter, s int, err error) {
 	response := ErrResponse{err.Error()}
 	writeHTTPResp(r, w, s, response)

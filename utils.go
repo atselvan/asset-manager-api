@@ -4,6 +4,8 @@ import "errors"
 
 type StringSlice []string
 
+// TODO : Move util methods into its own library
+
 func (s StringSlice) EntryExists(entry string) bool {
 	for i := 0; i < len(s); i++ {
 		if s[i] == entry {

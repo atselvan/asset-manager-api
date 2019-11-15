@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"github.com/gorilla/mux"
 	"log"
 	"net/http"
@@ -9,35 +8,29 @@ import (
 
 func init() {
 	var a Asset
+	Logger{Message: "Starting the server..."}.Info()
 	err := a.Init()
 	if err != nil {
 		Logger{Message: appInitErrorStr}.Error()
 	}
 }
 
+// TODO : Move constants to constants file
+const (
+	apiPathPrefix   = "/api/v1"
+	categoryApiPath = "/categories"
+	typeApiPath     = "/types"
+	brandApiPath    = "/brands"
+	assetsApiPath   = "/assets"
+)
+
 func main() {
 
-	Logger{Message: "Starting the server"}.Info()
-
 	r := mux.NewRouter()
-	r.HandleFunc("/category", categoryHandler).PathPrefix("/api/v1").Methods("GET", "POST")
-	r.PathPrefix("/api/v1").Path("/type").HandlerFunc(typeHandler).Methods("GET", "POST")
-	r.PathPrefix("/api/v1").Path("/brand").HandlerFunc(brandHandler).Methods("GET", "POST")
-
-	a := Asset{
-		Name:     "MacBook Pro",
-		Category: "device",
-		Ctype:    "laptop",
-		Model:    "MacBook Pro 15-inch SpaceGrey",
-		Serial:   "C02VC1TBHTD511",
-		Brand:    "Apple",
-		MnfYear:  "2017",
-		PDate:    "10/31/2017",
-		Price:    "2799",
-		Status:   "owned",
-	}
-
-	fmt.Println(a.Add())
+	r.PathPrefix(apiPathPrefix).Path(categoryApiPath).HandlerFunc(categoryHandler).Methods("GET", "POST")
+	r.PathPrefix(apiPathPrefix).Path(typeApiPath).HandlerFunc(typeHandler).Methods("GET", "POST")
+	r.PathPrefix(apiPathPrefix).Path(brandApiPath).HandlerFunc(brandHandler).Methods("GET", "POST")
+	r.PathPrefix(apiPathPrefix).Path(assetsApiPath).HandlerFunc(assetsHandler).Methods("GET", "POST")
 
 	log.Fatal(http.ListenAndServe(":8080", r))
 }

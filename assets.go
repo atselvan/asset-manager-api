@@ -1,6 +1,10 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"github.com/atselvan/go-pgdb-lib"
+	"github.com/atselvan/go-utils"
+)
 
 // Asset asset details
 type Asset struct {
@@ -24,58 +28,58 @@ type Asset struct {
 // The method adds the required enums and tables and returns a error if any
 func (a *Asset) Init() error {
 	var (
-		e Enum
-		t Table
+		e pgdb.Enum
+		t pgdb.Table
 	)
 
-	Logger{Message: appInitStr}.Info()
+	utils.Logger{Message: appInitStr}.Info()
 
-	e.name = categoryEnumTypeName
+	e.Name = categoryEnumTypeName
 	isExists, err := e.Exists()
 	if !isExists {
 		err = e.Create()
 		if err != nil {
 			return err
 		} else {
-			Logger{Message: fmt.Sprintf(enumCreatedStr, categoryEnumName)}.Info()
+			utils.Logger{Message: fmt.Sprintf(enumCreatedStr, categoryEnumName)}.Info()
 		}
 	} else {
-		Logger{Message: fmt.Sprintf(enumExistsStr, categoryEnumName)}.Info()
+		utils.Logger{Message: fmt.Sprintf(enumExistsStr, categoryEnumName)}.Info()
 	}
 
-	e.name = typeEnumTypeName
+	e.Name = typeEnumTypeName
 	isExists, err = e.Exists()
 	if !isExists {
 		err = e.Create()
 		if err != nil {
 			return err
 		} else {
-			Logger{Message: fmt.Sprintf(enumCreatedStr, typeEnumName)}.Info()
+			utils.Logger{Message: fmt.Sprintf(enumCreatedStr, typeEnumName)}.Info()
 		}
 	} else {
-		Logger{Message: fmt.Sprintf(enumExistsStr, typeEnumName)}.Info()
+		utils.Logger{Message: fmt.Sprintf(enumExistsStr, typeEnumName)}.Info()
 	}
 
-	e.name = brandEnumTypeName
+	e.Name = brandEnumTypeName
 	isExists, err = e.Exists()
 	if !isExists {
 		err = e.Create()
 		if err != nil {
 			return err
 		} else {
-			Logger{Message: fmt.Sprintf(enumCreatedStr, brandEnumName)}.Info()
+			utils.Logger{Message: fmt.Sprintf(enumCreatedStr, brandEnumName)}.Info()
 		}
 	} else {
-		Logger{Message: fmt.Sprintf(enumExistsStr, brandEnumName)}.Info()
+		utils.Logger{Message: fmt.Sprintf(enumExistsStr, brandEnumName)}.Info()
 	}
 
-	t = Table{
+	t = pgdb.Table{
 		Name: assetsTableName,
-		Columns: []TableColumn{
+		Columns: []pgdb.TableColumn{
 			{
 				Name:     "id",
 				DataType: "serial",
-				constraints: []string{
+				Constraints: []string{
 					"primary key",
 					"not null",
 				},
@@ -83,35 +87,35 @@ func (a *Asset) Init() error {
 			{
 				Name:     "name",
 				DataType: "varchar(100)",
-				constraints: []string{
+				Constraints: []string{
 					"not null",
 				},
 			},
 			{
 				Name:     "category",
 				DataType: categoryEnumTypeName,
-				constraints: []string{
+				Constraints: []string{
 					"not null",
 				},
 			},
 			{
 				Name:     "type",
 				DataType: typeEnumTypeName,
-				constraints: []string{
+				Constraints: []string{
 					"not null",
 				},
 			},
 			{
 				Name:     "model",
 				DataType: "varchar(50)",
-				constraints: []string{
+				Constraints: []string{
 					"not null",
 				},
 			},
 			{
 				Name:     "serial",
 				DataType: "varchar(50)",
-				constraints: []string{
+				Constraints: []string{
 					"unique",
 					"not null",
 				},
@@ -119,14 +123,14 @@ func (a *Asset) Init() error {
 			{
 				Name:     "brand",
 				DataType: brandEnumTypeName,
-				constraints: []string{
+				Constraints: []string{
 					"not null",
 				},
 			},
 			{
 				Name:     "manufactured_year",
 				DataType: "int",
-				constraints: []string{
+				Constraints: []string{
 					"not null",
 				},
 			},
@@ -154,13 +158,13 @@ func (a *Asset) Init() error {
 		if err != nil {
 			return err
 		} else {
-			Logger{Message: fmt.Sprintf(tableCreatedStr, assetsTableName)}.Info()
+			utils.Logger{Message: fmt.Sprintf(tableCreatedStr, assetsTableName)}.Info()
 		}
 	} else {
-		Logger{Message: fmt.Sprintf(tableExistsStr, assetsTableName)}.Info()
+		utils.Logger{Message: fmt.Sprintf(tableExistsStr, assetsTableName)}.Info()
 	}
 
-	Logger{Message: appInitCompletedStr}.Info()
+	utils.Logger{Message: appInitCompletedStr}.Info()
 
 	return nil
 }
@@ -168,11 +172,10 @@ func (a *Asset) Init() error {
 // GetAssets
 func (a *Asset) Get() ([]Asset, error) {
 	var (
-		dbConn DbConn
+		dbConn pgdb.DbConn
 		assets []Asset
 	)
 	db, err := dbConn.Connect()
-	defer dbConn.Close(db)
 	if err != nil {
 		return nil, err
 	}
@@ -189,6 +192,10 @@ func (a *Asset) Get() ([]Asset, error) {
 		fmt.Println(a)
 		assets = append(assets, a)
 	}
+	err = dbConn.Close(db)
+	if err != nil {
+		return nil, err
+	}
 	return assets, nil
 }
 
@@ -198,10 +205,47 @@ func (a *Asset) Get() ([]Asset, error) {
 
 // GetAssetByCategory
 
-// AddAsset
-// TODO : Check if a asset already exists
+// Exists checks if a asset already exists in the database
+// The method returns a boolean value and an error if something goes wrong
+func (a *Asset) Exists() (string, error) {
+	if err := a.validateSerial(); err != nil {
+		return "", err
+	}
+	var dbConn pgdb.DbConn
+	db, err := dbConn.Connect()
+	if err != nil {
+		return "", err
+	}
+	defer dbConn.Close(db)
+	var id string
+	err = db.QueryRow(fmt.Sprintf("select id from %s where serial = '%s'", assetsTableName, a.Serial)).Scan(&id)
+	if id == "" {
+		return id, err
+	} else {
+		return id, err
+	}
+}
+
+func (a *Asset) validateSerial() error {
+	if a.Serial == "" {
+		return utils.NewError("'serial' is a required parameter")
+	} else {
+		return nil
+	}
+}
+
+func (a *Asset) IsValid() error {
+	if a.Name == "" || a.Category == "" || a.Ctype == "" || a.Model == "" || a.Serial == "" || a.Brand == "" || a.MnfYear == "" {
+		return utils.NewError("name, category, type, model, serial, brand and manufactured_year are required parameters")
+	} else {
+		return nil
+	}
+}
+
+// Add adds a asset to the assets table in the database
+// The method returns an error if something goes wrong
 func (a *Asset) Add() (string, error) {
-	var dbConn DbConn
+	var dbConn pgdb.DbConn
 	db, err := dbConn.Connect()
 	if err != nil {
 		return "", err

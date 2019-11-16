@@ -2,10 +2,11 @@ package main
 
 import (
 	"fmt"
+	"github.com/atselvan/go-pgdb-lib"
+	"github.com/atselvan/go-utils"
 	"net/http"
 )
 
-// TODO : Redesign HTTP response and Logger utils
 // TODO: Improve Handler info msg. eg: 'Apple1' is added to asset_brand
 // TODO: Update home handler + add page not found handler
 
@@ -48,88 +49,90 @@ func brandHandler(w http.ResponseWriter, r *http.Request) {
 
 func enumGetHandler(w http.ResponseWriter, r *http.Request, enumName string) {
 	if enumName == "" {
-		writeErrorResp(r, w, internalServerErrorStatusCode, NewError("enum name is a required parameter"))
+		utils.WriteErrorResp(w, r, utils.InternalServerErrorStatusCode, utils.NewError("enum name is a required parameter"))
 		return
 	}
-	e := Enum{
-		name: enumName,
+	e := pgdb.Enum{
+		Name: enumName,
 	}
 	err := e.Get()
 	if err != nil {
-		writeErrorResp(r, w, badRequestStatusCode, err)
+		utils.WriteErrorResp(w, r, utils.BadRequestStatusCode, err)
 		return
 	} else {
-		if len(e.values) < 1 {
-			writeHTTPResp(r, w, successStatusCode, StringSlice{})
+		if len(e.Values) < 1 {
+			utils.WriteHTTPResp(w, r, utils.SuccessStatusCode, utils.StringSlice{})
 		} else {
-			writeHTTPResp(r, w, successStatusCode, e.values)
+			utils.WriteHTTPResp(w, r, utils.SuccessStatusCode, e.Values)
 		}
 	}
 }
 
 func enumPostHandler(w http.ResponseWriter, r *http.Request, enumName string) {
 	if enumName == "" {
-		writeErrorResp(r, w, internalServerErrorStatusCode, NewError("enum name is a required parameter"))
+		utils.WriteErrorResp(w, r, utils.InternalServerErrorStatusCode, utils.NewError("enum name is a required parameter"))
 		return
 	}
 	value := r.URL.Query().Get("value")
 	if value == "" {
-		writeErrorResp(r, w, badRequestStatusCode, NewError("value is a required parameter"))
+		utils.WriteErrorResp(w, r, utils.BadRequestStatusCode, utils.NewError("value is a required parameter"))
 		return
 	} else {
-		e := Enum{
-			name:   enumName,
-			values: StringSlice{value},
+		e := pgdb.Enum{
+			Name:   enumName,
+			Values: utils.StringSlice{value},
 		}
 		err := e.Update()
 		if err != nil {
-			writeErrorResp(r, w, badRequestStatusCode, err)
+			utils.WriteErrorResp(w, r, utils.BadRequestStatusCode, err)
 			return
 		} else {
-			writeInfoResp(r, w, successStatusCode, fmt.Sprintf("'%s' is added to %s", value, enumName))
+			utils.WriteInfoResp(w, r, utils.SuccessStatusCode, fmt.Sprintf("'%s' is added to %s", value, enumName))
 		}
 	}
 }
 
 func assetsHandler(w http.ResponseWriter, r *http.Request) {
+	var a Asset
 
 	switch r.Method {
 
 	case "GET":
-		var a Asset
 		assets, err := a.Get()
 		if err != nil {
-			writeErrorResp(r, w, internalServerErrorStatusCode, err)
+			utils.WriteErrorResp(w, r, utils.InternalServerErrorStatusCode, err)
 		} else {
 			fmt.Println(assets)
 			fmt.Println(len(assets))
 			if len(assets) < 1 {
-				writeHTTPResp(r, w, notFoundStatusCode, Response{Message: "No Assets were found"})
+				utils.WriteHTTPResp(w, r, utils.NotFoundStatusCode, utils.Response{Message: "No Assets were found"})
 			} else {
-				writeHTTPResp(r, w, successStatusCode, &assets)
+				utils.WriteHTTPResp(w, r, utils.SuccessStatusCode, &assets)
 			}
 		}
 
 	case "POST":
-		a := Asset{
-			Name:     "MacBook Pro",
-			Category: "device",
-			Ctype:    "laptop",
-			Model:    "MacBook Pro 15-inch SpaceGrey",
-			Serial:   "C02VC1TBHTD51",
-			Brand:    "Apple",
-			MnfYear:  "2017",
-			PDate:    "10/31/2017",
-			Price:    "2799",
-			Status:   "owned",
-		}
-		fmt.Println(a)
-
-		id, err := a.Add()
+		err := utils.ReadRequestBody(r, &a)
 		if err != nil {
-			writeErrorResp(r, w, internalServerErrorStatusCode, err)
+			utils.WriteErrorResp(w, r, utils.InternalServerErrorStatusCode, err)
+			return
+		}
+		if err := a.IsValid(); err != nil {
+			utils.WriteErrorResp(w, r, utils.BadRequestStatusCode, err)
+			return
+		}
+		id, err := a.Exists()
+		if id != "" {
+			utils.WriteInfoResp(w, r, utils.FoundStatusCode, fmt.Sprintf("Asset with serial '%s' already exists with id '%s'", a.Serial, id))
+		} else if id == "" {
+			id, err := a.Add()
+			if err != nil {
+				utils.WriteErrorResp(w, r, utils.InternalServerErrorStatusCode, err)
+			} else {
+				utils.WriteHTTPResp(w, r, utils.SuccessStatusCode, utils.Response{Message: fmt.Sprintf("Asset information is added with id '%s'", id)})
+			}
 		} else {
-			writeHTTPResp(r, w, successStatusCode, Response{Message: fmt.Sprintf("Asset information is added with id '%s'", id)})
+			utils.WriteErrorResp(w, r, utils.InternalServerErrorStatusCode, err)
 		}
 	}
 }

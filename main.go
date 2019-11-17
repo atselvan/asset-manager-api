@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"github.com/atselvan/go-utils"
 	"github.com/gorilla/mux"
 	"log"
@@ -15,29 +14,17 @@ func init() {
 	if err != nil {
 		utils.Logger{Message: appInitErrorStr}.Error()
 	}
-
-	a.Category = "devices"
-	fmt.Println(a.isValidAssetCategory())
-
-	a.isValidAssetPDate()
 }
-
-// TODO : Move constants to constants file
-const (
-	apiPathPrefix   = "/api/v1"
-	categoryApiPath = "/categories"
-	typeApiPath     = "/types"
-	brandApiPath    = "/brands"
-	assetsApiPath   = "/assets"
-)
 
 func main() {
 
 	r := mux.NewRouter()
-	r.PathPrefix(apiPathPrefix).Path(categoryApiPath).HandlerFunc(categoryHandler).Methods("GET", "POST")
-	r.PathPrefix(apiPathPrefix).Path(typeApiPath).HandlerFunc(typeHandler).Methods("GET", "POST")
-	r.PathPrefix(apiPathPrefix).Path(brandApiPath).HandlerFunc(brandHandler).Methods("GET", "POST")
+	r.PathPrefix(apiPathPrefix).Path(healthApiPath).HandlerFunc(healthHandler).Methods("GET")
+	r.PathPrefix(apiPathPrefix).Path(assetCategoryApiPath).HandlerFunc(assetCategoryHandler).Methods("GET", "POST")
+	r.PathPrefix(apiPathPrefix).Path(assetTypeApiPath).HandlerFunc(assetTypeHandler).Methods("GET", "POST")
+	r.PathPrefix(apiPathPrefix).Path(assetBrandApiPath).HandlerFunc(assetBrandHandler).Methods("GET", "POST")
+	r.PathPrefix(apiPathPrefix).Path(assetStatusApiPath).HandlerFunc(assetStatusHandler).Methods("GET", "POST")
 	r.PathPrefix(apiPathPrefix).Path(assetsApiPath).HandlerFunc(assetsHandler).Methods("GET", "POST", "PUT")
-
+	r.NotFoundHandler = http.HandlerFunc(pageNotFoundHandler)
 	log.Fatal(http.ListenAndServe(":8080", r))
 }

@@ -1,6 +1,13 @@
 package main
 
 const (
+	apiPathPrefix            = "/api/v1"
+	healthApiPath            = "/health"
+	assetCategoryApiPath     = "/asset/categories"
+	assetTypeApiPath         = "/asset/types"
+	assetBrandApiPath        = "/asset/brands"
+	assetStatusApiPath       = "/asset/status"
+	assetsApiPath            = "/assets"
 	assetsTableName          = "assets"
 	categoryEnumName         = "category"
 	categoryEnumTypeName     = "assets_category"
@@ -27,10 +34,10 @@ const (
 	assetColourReqStr        = "Asset colour is a required parameter"
 	assetModelReqStr         = "Asset model is a required parameter"
 	assetSerialReqStr        = "Asset serial is a required parameter"
-	assetSerialExistsStr     = "Asset serial '%s' already exists with id '%s'"
+	assetSerialExistsStr     = "Asset with serial '%s' already exists with id '%s'"
 	assetMnfYearReqStr       = "Asset manufactured_year is a required parameter"
 	assetMnfYearInvalidStr   = "Asset manufactured_year is not valid"
-	assetPDateReqStr = "Asset purchase_date is a required parameter"
+	assetPDateReqStr         = "Asset purchase_date is a required parameter"
 	assetPDateInvalidStr     = "Asset purchased_date is not valid"
 	assetPriceReqStr         = "Asset price is a required parameter"
 	assetStatusReqStr        = "Asset status is a required parameter"

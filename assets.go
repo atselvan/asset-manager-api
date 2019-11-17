@@ -17,10 +17,19 @@ type Asset struct {
 	Model    string  `json:"model"`
 	Colour   string  `json:"colour"`
 	Serial   string  `json:"serial"`
-	MnfYear  int  `json:"manufactured_year"`
-	PDate    string  `json:"purchased_data"`
+	MnfYear  int     `json:"manufactured_year"`
+	PDate    string  `json:"purchase_date"`
 	Price    float64 `json:"price"`
 	Status   string  `json:"status"`
+}
+
+// IsNotEmptyAssetInfo checks if all the required parameters are set
+func (a *Asset) IsNotEmptyAssetInfo() error {
+	if a.Name == "" || a.Category == "" || a.Ctype == "" || a.Brand == "" || a.Model == "" || a.Colour == "" || a.Serial == "" || a.MnfYear == 0 || a.Status == "" {
+		return utils.NewError("name, category, type, brand, model, colour, serial, manufactured_year and status are required parameters")
+	} else {
+		return nil
+	}
 }
 
 // isValidAssetName check if asset name is valid
@@ -58,7 +67,7 @@ func (a *Asset) isValidAssetType() error {
 		return err
 	}
 	if !utils.EntryExists(e.Values, a.Ctype) {
-		return utils.Error{ErrMsg: fmt.Sprintf(assetTypeNotFoundStr, a.Category, utils.GetSliceAsCommaSeparatedString(e.Values))}.NewError()
+		return utils.Error{ErrMsg: fmt.Sprintf(assetTypeNotFoundStr, a.Ctype, utils.GetSliceAsCommaSeparatedString(e.Values))}.NewError()
 	}
 	return nil
 }
@@ -74,7 +83,7 @@ func (a *Asset) isValidAssetBrand() error {
 		return err
 	}
 	if !utils.EntryExists(e.Values, a.Brand) {
-		return utils.Error{ErrMsg: fmt.Sprintf(assetBrandNotFoundStr, a.Category, utils.GetSliceAsCommaSeparatedString(e.Values))}.NewError()
+		return utils.Error{ErrMsg: fmt.Sprintf(assetBrandNotFoundStr, a.Brand, utils.GetSliceAsCommaSeparatedString(e.Values))}.NewError()
 	}
 	return nil
 }
@@ -101,10 +110,13 @@ func (a *Asset) isValidAssetSerial() error {
 	if a.Serial == "" {
 		return utils.Error{ErrMsg: assetSerialReqStr}.NewError()
 	}
-	if id, err := a.Exists(); err != nil {
+	if id, err := a.Exists(); id != "" {
 		return utils.Error{ErrMsg: fmt.Sprintf(assetSerialExistsStr, a.Serial, id)}.NewError()
+	} else if err.Error() == "sql: no rows in result set" {
+		return nil
+	} else {
+		return err
 	}
-	return nil
 }
 
 // isValidMnfYear check if the manufactured year is valid
@@ -130,14 +142,6 @@ func (a *Asset) isValidAssetPDate() error {
 	return nil
 }
 
-// isValidAssetPrice trims spaces and returns the value of the asset price
-func (a *Asset) isValidAssetPrice() error {
-	if a.Price == 0 {
-		return utils.Error{ErrMsg: assetPriceReqStr}.NewError()
-	}
-	return nil
-}
-
 // isValidAssetStatus checks if asset status is valid
 func (a *Asset) isValidAssetStatus() error {
 	a.Status = strings.TrimSpace(a.Status)
@@ -149,19 +153,49 @@ func (a *Asset) isValidAssetStatus() error {
 		return err
 	}
 	if !utils.EntryExists(e.Values, a.Status) {
-		return utils.Error{ErrMsg: fmt.Sprintf(assetStatusNotFoundStr, a.Category, utils.GetSliceAsCommaSeparatedString(e.Values))}.NewError()
+		return utils.Error{ErrMsg: fmt.Sprintf(assetStatusNotFoundStr, a.Status, utils.GetSliceAsCommaSeparatedString(e.Values))}.NewError()
 	}
 	return nil
 }
 
-func (a *Asset) IsValidAssetInfo() error {
-
-	return nil
-}
-
-func (a *Asset) IsNotEmptyAssetInfo() error {
-	if a.Name == "" || a.Category == "" || a.Ctype == "" || a.Model == "" || a.Serial == "" || a.Brand == "" || a.MnfYear == "" {
-		return utils.NewError("name, category, type, model, serial, brand and manufactured_year are required parameters")
+func (a *Asset) IsValidAssetInfo() []utils.ErrResponse {
+	var errors []utils.ErrResponse
+	if err := a.IsNotEmptyAssetInfo(); err != nil {
+		errors = append(errors, utils.ErrResponse{Error: err.Error()})
+		return errors
+	}
+	if err := a.isValidAssetName(); err != nil {
+		errors = append(errors, utils.ErrResponse{Error: err.Error()})
+	}
+	if err := a.isValidAssetCategory(); err != nil {
+		errors = append(errors, utils.ErrResponse{Error: err.Error()})
+	}
+	if err := a.isValidAssetType(); err != nil {
+		errors = append(errors, utils.ErrResponse{Error: err.Error()})
+	}
+	if err := a.isValidAssetBrand(); err != nil {
+		errors = append(errors, utils.ErrResponse{Error: err.Error()})
+	}
+	if err := a.isValidAssetModel(); err != nil {
+		errors = append(errors, utils.ErrResponse{Error: err.Error()})
+	}
+	if err := a.isValidAssetColour(); err != nil {
+		errors = append(errors, utils.ErrResponse{Error: err.Error()})
+	}
+	if err := a.isValidAssetSerial(); err != nil {
+		errors = append(errors, utils.ErrResponse{Error: err.Error()})
+	}
+	if err := a.isValidMnfYear(); err != nil {
+		errors = append(errors, utils.ErrResponse{Error: err.Error()})
+	}
+	if err := a.isValidAssetPDate(); err != nil {
+		errors = append(errors, utils.ErrResponse{Error: err.Error()})
+	}
+	if err := a.isValidAssetStatus(); err != nil {
+		errors = append(errors, utils.ErrResponse{Error: err.Error()})
+	}
+	if len(errors) > 0 {
+		return errors
 	} else {
 		return nil
 	}
@@ -334,7 +368,8 @@ func (a *Asset) Init() error {
 	return nil
 }
 
-// GetAssets
+// GetAssets gets all the assets from the database
+// The method returns a slice of assets or an error if something goes wrong
 func (a *Asset) Get() ([]Asset, error) {
 	var (
 		dbConn pgdb.DbConn
@@ -350,7 +385,7 @@ func (a *Asset) Get() ([]Asset, error) {
 	}
 	for rows.Next() {
 		var a Asset
-		err = rows.Scan(&a.Id, &a.Name, &a.Category, &a.Ctype, &a.Model, &a.Serial, &a.Brand, &a.MnfYear, &a.PDate, &a.Price, &a.Status)
+		err = rows.Scan(&a.Id, &a.Name, &a.Category, &a.Ctype, &a.Brand, &a.Model, &a.Colour, &a.Serial, &a.MnfYear, &a.PDate, &a.Price, &a.Status)
 		if err != nil {
 			return nil, dbConn.RowScanError(err)
 		}
@@ -372,17 +407,16 @@ func (a *Asset) Get() ([]Asset, error) {
 // Exists checks if a asset already exists in the database
 // The method returns a boolean value and an error if something goes wrong
 func (a *Asset) Exists() (string, error) {
-	if err := a.validateSerial(); err != nil {
-		return "", err
-	}
 	var dbConn pgdb.DbConn
 	db, err := dbConn.Connect()
 	if err != nil {
-		return "", err
+		return "", dbConn.ConnectionError(err)
 	}
-	defer dbConn.Close(db)
 	var id string
 	err = db.QueryRow(fmt.Sprintf("select id from %s where serial = '%s'", assetsTableName, a.Serial)).Scan(&id)
+	if err := dbConn.Close(db); err != nil {
+		return id, dbConn.ClosureError(err)
+	}
 	if id == "" {
 		return id, err
 	} else {
@@ -396,19 +430,18 @@ func (a *Asset) Add() (string, error) {
 	var dbConn pgdb.DbConn
 	db, err := dbConn.Connect()
 	if err != nil {
-		return "", err
+		return "", dbConn.ConnectionError(err)
 	}
-	sqlStatement := fmt.Sprintf(`insert into %s (name, category, type, model, serial, brand, manufactured_year, purchased_date, price, status) 
-		VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s', '%s' ) RETURNING id`,
-		assetsTableName, a.Name, a.Category, a.Ctype, a.Model, a.Serial, a.Brand, a.MnfYear, a.PDate, a.Price, a.Status)
+	sqlStatement := fmt.Sprintf(`insert into %s (name, category, type, brand, model, colour, serial, manufactured_year, purchased_date, price, status) 
+		VALUES ('%s', '%s', '%s', '%s', '%s', '%s', '%s', '%d', '%s', '%f', '%s' ) RETURNING id`,
+		assetsTableName, a.Name, a.Category, a.Ctype, a.Brand, a.Model, a.Colour, a.Serial, a.MnfYear, a.PDate, a.Price, a.Status)
 	var id string
 	err = db.QueryRow(sqlStatement).Scan(&id)
 	if err != nil {
-		return "", err
+		return "", dbConn.QueryExecError(err)
 	}
-	err = dbConn.Close(db)
-	if err != nil {
-		return "", err
+	if err := dbConn.Close(db); err != nil {
+		return "", dbConn.ClosureError(err)
 	}
 	return id, nil
 }

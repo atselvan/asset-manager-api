@@ -7,13 +7,15 @@ import (
 	"net/http"
 )
 
-// TODO: Update home handler + add page not found handler
-
-func homeHandler(w http.ResponseWriter, r *http.Request) {
-
+func healthHandler(w http.ResponseWriter, r *http.Request) {
+	utils.WriteInfoResp(w, r, utils.SuccessStatusCode, "OK")
 }
 
-func categoryHandler(w http.ResponseWriter, r *http.Request) {
+func pageNotFoundHandler(w http.ResponseWriter, r *http.Request) {
+	utils.WriteInfoResp(w, r, utils.NotFoundStatusCode, fmt.Sprintf("Request path '%s' not found", r.RequestURI))
+}
+
+func assetCategoryHandler(w http.ResponseWriter, r *http.Request) {
 
 	switch r.Method {
 	case "GET":
@@ -24,7 +26,7 @@ func categoryHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func typeHandler(w http.ResponseWriter, r *http.Request) {
+func assetTypeHandler(w http.ResponseWriter, r *http.Request) {
 
 	switch r.Method {
 	case "GET":
@@ -35,7 +37,7 @@ func typeHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func brandHandler(w http.ResponseWriter, r *http.Request) {
+func assetBrandHandler(w http.ResponseWriter, r *http.Request) {
 
 	switch r.Method {
 	case "GET":
@@ -43,6 +45,17 @@ func brandHandler(w http.ResponseWriter, r *http.Request) {
 
 	case "POST":
 		enumPostHandler(w, r, brandEnumTypeName)
+	}
+}
+
+func assetStatusHandler(w http.ResponseWriter, r *http.Request) {
+
+	switch r.Method {
+	case "GET":
+		enumGetHandler(w, r, statusEnumTypeName)
+
+	case "POST":
+		enumPostHandler(w, r, statusEnumTypeName)
 	}
 }
 
@@ -116,10 +129,10 @@ func assetsHandler(w http.ResponseWriter, r *http.Request) {
 			utils.WriteErrorResp(w, r, utils.InternalServerErrorStatusCode, err)
 			return
 		}
-		//if err := a.IsValid(); err != nil {
-		//	utils.WriteErrorResp(w, r, utils.BadRequestStatusCode, err)
-		//	return
-		//}
+		if err := a.IsValidAssetInfo(); err != nil {
+			utils.WriteHTTPResp(w, r, utils.BadRequestStatusCode, err)
+			return
+		}
 		id, err := a.Exists()
 		if id != "" {
 			utils.WriteInfoResp(w, r, utils.FoundStatusCode, fmt.Sprintf("Asset with serial '%s' already exists with id '%s'", a.Serial, id))

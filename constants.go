@@ -1,24 +1,38 @@
 package main
 
-import "fmt"
-
 const (
-	assetsTableName     = "assets"
-	categoryEnumName    = "category"
-	typeEnumName        = "type"
-	brandEnumName       = "brand"
-	appInitStr          = "Begin application initialisation"
-	appInitCompletedStr = "Application initialisation Completed"
-	appInitErrorStr     = "There was an error in the initialisation"
-	enumNameFormat      = "%s_%s"
-	enumExistsStr       = "Enum '%s' already exists"
-	enumCreatedStr      = "Enum '%s' is created in the database"
-	tableExistsStr      = "Table '%s' already exists"
-	tableCreatedStr     = "Table '%s' is created"
-)
-
-var (
-	categoryEnumTypeName = fmt.Sprintf(enumNameFormat, assetsTableName, categoryEnumName)
-	typeEnumTypeName     = fmt.Sprintf(enumNameFormat, assetsTableName, typeEnumName)
-	brandEnumTypeName    = fmt.Sprintf(enumNameFormat, assetsTableName, brandEnumName)
+	assetsTableName          = "assets"
+	categoryEnumName         = "category"
+	categoryEnumTypeName     = "assets_category"
+	typeEnumName             = "type"
+	typeEnumTypeName         = "assets_type"
+	brandEnumName            = "brand"
+	brandEnumTypeName        = "assets_brand"
+	statusEnumName           = "status"
+	statusEnumTypeName       = "assets_status"
+	appInitStr               = "Begin application initialisation"
+	appInitCompletedStr      = "Application initialisation Completed"
+	appInitErrorStr          = "There was an error in the initialisation"
+	enumExistsStr            = "Enum '%s' already exists"
+	enumCreatedStr           = "Enum '%s' is created"
+	tableExistsStr           = "Table '%s' already exists"
+	tableCreatedStr          = "Table '%s' is created"
+	assetNameReqStr          = "Asset name is a required parameter"
+	assetCategoryReqStr      = "Asset category is a required parameter"
+	assetCategoryNotFoundStr = "Asset category '%s' was not found. Available categories : %s"
+	assetTypeReqStr          = "Asset type is a required parameter"
+	assetTypeNotFoundStr     = "Asset type '%s' was not found. Available types are %s"
+	assetBrandReqStr         = "Asset brand is a required parameter"
+	assetBrandNotFoundStr    = "Asset brand '%s' was not found. Available brands are %s"
+	assetColourReqStr        = "Asset colour is a required parameter"
+	assetModelReqStr         = "Asset model is a required parameter"
+	assetSerialReqStr        = "Asset serial is a required parameter"
+	assetSerialExistsStr     = "Asset serial '%s' already exists with id '%s'"
+	assetMnfYearReqStr       = "Asset manufactured_year is a required parameter"
+	assetMnfYearInvalidStr   = "Asset manufactured_year is not valid"
+	assetPDateReqStr = "Asset purchase_date is a required parameter"
+	assetPDateInvalidStr     = "Asset purchased_date is not valid"
+	assetPriceReqStr         = "Asset price is a required parameter"
+	assetStatusReqStr        = "Asset status is a required parameter"
+	assetStatusNotFoundStr   = "Asset status '%s' was not found. Available status's are %s"
 )

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/atselvan/go-utils"
 	"github.com/gorilla/mux"
 	"log"
@@ -14,6 +15,11 @@ func init() {
 	if err != nil {
 		utils.Logger{Message: appInitErrorStr}.Error()
 	}
+
+	a.Category = "devices"
+	fmt.Println(a.isValidAssetCategory())
+
+	a.isValidAssetPDate()
 }
 
 // TODO : Move constants to constants file

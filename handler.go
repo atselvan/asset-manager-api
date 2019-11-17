@@ -7,7 +7,6 @@ import (
 	"net/http"
 )
 
-// TODO: Improve Handler info msg. eg: 'Apple1' is added to asset_brand
 // TODO: Update home handler + add page not found handler
 
 func homeHandler(w http.ResponseWriter, r *http.Request) {
@@ -61,7 +60,7 @@ func enumGetHandler(w http.ResponseWriter, r *http.Request, enumName string) {
 		return
 	} else {
 		if len(e.Values) < 1 {
-			utils.WriteHTTPResp(w, r, utils.SuccessStatusCode, utils.StringSlice{})
+			utils.WriteHTTPResp(w, r, utils.SuccessStatusCode, []string{})
 		} else {
 			utils.WriteHTTPResp(w, r, utils.SuccessStatusCode, e.Values)
 		}
@@ -80,7 +79,7 @@ func enumPostHandler(w http.ResponseWriter, r *http.Request, enumName string) {
 	} else {
 		e := pgdb.Enum{
 			Name:   enumName,
-			Values: utils.StringSlice{value},
+			Values: []string{value},
 		}
 		err := e.Update()
 		if err != nil {
@@ -117,10 +116,10 @@ func assetsHandler(w http.ResponseWriter, r *http.Request) {
 			utils.WriteErrorResp(w, r, utils.InternalServerErrorStatusCode, err)
 			return
 		}
-		if err := a.IsValid(); err != nil {
-			utils.WriteErrorResp(w, r, utils.BadRequestStatusCode, err)
-			return
-		}
+		//if err := a.IsValid(); err != nil {
+		//	utils.WriteErrorResp(w, r, utils.BadRequestStatusCode, err)
+		//	return
+		//}
 		id, err := a.Exists()
 		if id != "" {
 			utils.WriteInfoResp(w, r, utils.FoundStatusCode, fmt.Sprintf("Asset with serial '%s' already exists with id '%s'", a.Serial, id))

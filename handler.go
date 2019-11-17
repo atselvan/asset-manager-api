@@ -5,6 +5,7 @@ import (
 	"github.com/atselvan/go-pgdb-lib"
 	"github.com/atselvan/go-utils"
 	"net/http"
+	"strings"
 )
 
 func healthHandler(w http.ResponseWriter, r *http.Request) {
@@ -19,10 +20,10 @@ func assetCategoryHandler(w http.ResponseWriter, r *http.Request) {
 
 	switch r.Method {
 	case "GET":
-		enumGetHandler(w, r, categoryEnumTypeName)
+		enumGetHandler(w, r, categoryEnumName)
 
 	case "POST":
-		enumPostHandler(w, r, categoryEnumTypeName)
+		enumPostHandler(w, r, categoryEnumName)
 	}
 }
 
@@ -30,10 +31,10 @@ func assetTypeHandler(w http.ResponseWriter, r *http.Request) {
 
 	switch r.Method {
 	case "GET":
-		enumGetHandler(w, r, typeEnumTypeName)
+		enumGetHandler(w, r, typeEnumName)
 
 	case "POST":
-		enumPostHandler(w, r, typeEnumTypeName)
+		enumPostHandler(w, r, typeEnumName)
 	}
 }
 
@@ -41,10 +42,10 @@ func assetBrandHandler(w http.ResponseWriter, r *http.Request) {
 
 	switch r.Method {
 	case "GET":
-		enumGetHandler(w, r, brandEnumTypeName)
+		enumGetHandler(w, r, brandEnumName)
 
 	case "POST":
-		enumPostHandler(w, r, brandEnumTypeName)
+		enumPostHandler(w, r, brandEnumName)
 	}
 }
 
@@ -52,20 +53,16 @@ func assetStatusHandler(w http.ResponseWriter, r *http.Request) {
 
 	switch r.Method {
 	case "GET":
-		enumGetHandler(w, r, statusEnumTypeName)
+		enumGetHandler(w, r, statusEnumName)
 
 	case "POST":
-		enumPostHandler(w, r, statusEnumTypeName)
+		enumPostHandler(w, r, statusEnumName)
 	}
 }
 
 func enumGetHandler(w http.ResponseWriter, r *http.Request, enumName string) {
-	if enumName == "" {
-		utils.WriteErrorResp(w, r, utils.InternalServerErrorStatusCode, utils.NewError("enum name is a required parameter"))
-		return
-	}
 	e := pgdb.Enum{
-		Name: enumName,
+		Name: "assets_" + enumName,
 	}
 	err := e.Get()
 	if err != nil {
@@ -74,32 +71,38 @@ func enumGetHandler(w http.ResponseWriter, r *http.Request, enumName string) {
 	} else {
 		if len(e.Values) < 1 {
 			utils.WriteHTTPResp(w, r, utils.SuccessStatusCode, []string{})
+			utils.Logger{Request: r, Message: fmt.Sprintf(getEnumSuccessStr, enumName)}.Info()
 		} else {
 			utils.WriteHTTPResp(w, r, utils.SuccessStatusCode, e.Values)
+			utils.Logger{Request: r, Message: fmt.Sprintf(getEnumSuccessStr, enumName)}.Info()
 		}
 	}
 }
 
 func enumPostHandler(w http.ResponseWriter, r *http.Request, enumName string) {
-	if enumName == "" {
-		utils.WriteErrorResp(w, r, utils.InternalServerErrorStatusCode, utils.NewError("enum name is a required parameter"))
-		return
-	}
 	value := r.URL.Query().Get("value")
 	if value == "" {
-		utils.WriteErrorResp(w, r, utils.BadRequestStatusCode, utils.NewError("value is a required parameter"))
+		utils.WriteErrorResp(w, r, utils.BadRequestStatusCode, utils.Error{ErrMsg: valueRequiredStr}.NewError())
 		return
 	} else {
 		e := pgdb.Enum{
-			Name:   enumName,
-			Values: []string{value},
+			Name: "assets_" + enumName,
 		}
+		if err := e.Get(); err != nil {
+			utils.WriteErrorResp(w, r, utils.InternalServerErrorStatusCode, err)
+			return
+		}
+		if utils.EntryExists(e.Values, value) {
+			utils.WriteInfoResp(w, r, utils.FoundStatusCode, fmt.Sprintf(enumValueExistsStr, enumName, value))
+			return
+		}
+		e.Values = []string{value}
 		err := e.Update()
 		if err != nil {
 			utils.WriteErrorResp(w, r, utils.BadRequestStatusCode, err)
 			return
 		} else {
-			utils.WriteInfoResp(w, r, utils.SuccessStatusCode, fmt.Sprintf("'%s' is added to %s", value, enumName))
+			utils.WriteInfoResp(w, r, utils.SuccessStatusCode, fmt.Sprintf("%s '%s' is added", strings.Title(enumName), value))
 		}
 	}
 }
@@ -114,12 +117,12 @@ func assetsHandler(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			utils.WriteErrorResp(w, r, utils.InternalServerErrorStatusCode, err)
 		} else {
-			fmt.Println(assets)
-			fmt.Println(len(assets))
 			if len(assets) < 1 {
-				utils.WriteHTTPResp(w, r, utils.NotFoundStatusCode, utils.Response{Message: "No Assets were found"})
+				utils.WriteHTTPResp(w, r, utils.NotFoundStatusCode, utils.Response{Message: noAssetFoundStr})
+				utils.Logger{Request: r, Message: fmt.Sprintf(noAssetFoundStr)}.Info()
 			} else {
 				utils.WriteHTTPResp(w, r, utils.SuccessStatusCode, &assets)
+				utils.Logger{Request: r, Message: fmt.Sprintf(getAssetSuccessStr)}.Info()
 			}
 		}
 

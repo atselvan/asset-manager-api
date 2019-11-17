@@ -42,4 +42,9 @@ const (
 	assetPriceReqStr         = "Asset price is a required parameter"
 	assetStatusReqStr        = "Asset status is a required parameter"
 	assetStatusNotFoundStr   = "Asset status '%s' was not found. Available status's are %s"
+	valueRequiredStr         = "value is a required parameter"
+	getEnumSuccessStr        = "%s enum retrieved successfully"
+	noAssetFoundStr          = "No Assets were found"
+	getAssetSuccessStr       = "Assets retrieved successfully"
+	enumValueExistsStr       = "%s '%s' already exists"
 )

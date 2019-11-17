@@ -7,7 +7,7 @@ import (
 	"strings"
 )
 
-// Asset asset details
+// Asset represents asset information
 type Asset struct {
 	Id       int     `json:"id"`
 	Name     string  `json:"name"`
@@ -25,14 +25,15 @@ type Asset struct {
 
 // IsNotEmptyAssetInfo checks if all the required parameters are set
 func (a *Asset) IsNotEmptyAssetInfo() error {
-	if a.Name == "" || a.Category == "" || a.Ctype == "" || a.Brand == "" || a.Model == "" || a.Colour == "" || a.Serial == "" || a.MnfYear == 0 || a.Status == "" {
-		return utils.NewError("name, category, type, brand, model, colour, serial, manufactured_year and status are required parameters")
+	if a.Name == "" || a.Category == "" || a.Ctype == "" || a.Brand == "" || a.Model == "" || a.Colour == "" || a.Serial == "" || a.MnfYear == 0 || a.PDate == "" || a.Status == "" {
+		return utils.NewError("name, category, type, brand, model, colour, serial, manufactured_year, purchase_date and status are required parameters")
 	} else {
 		return nil
 	}
 }
 
 // isValidAssetName check if asset name is valid
+// The method returns an error if the condition fails
 func (a *Asset) isValidAssetName() error {
 	if a.Name == "" {
 		return utils.Error{ErrMsg: assetNameReqStr}.NewError()
@@ -347,7 +348,6 @@ func (a *Asset) Init() error {
 			},
 		},
 	}
-
 	isExists, err = t.Exists()
 	if err != nil {
 		return err
@@ -389,7 +389,6 @@ func (a *Asset) Get() ([]Asset, error) {
 		if err != nil {
 			return nil, dbConn.RowScanError(err)
 		}
-		fmt.Println(a)
 		assets = append(assets, a)
 	}
 	if err = dbConn.Close(db); err != nil {

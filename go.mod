@@ -1,4 +1,4 @@
-module github.com/atselvan/asset-manager
+module github.com/atselvan/asset-manager-api
 
 go 1.13
 

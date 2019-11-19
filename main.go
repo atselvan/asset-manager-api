@@ -26,5 +26,5 @@ func main() {
 	r.PathPrefix(apiPathPrefix).Path(assetStatusApiPath).HandlerFunc(assetStatusHandler).Methods("GET", "POST")
 	r.PathPrefix(apiPathPrefix).Path(assetsApiPath).HandlerFunc(assetsHandler).Methods("GET", "POST", "PUT")
 	r.NotFoundHandler = http.HandlerFunc(pageNotFoundHandler)
-	log.Fatal(http.ListenAndServe(":8080", r))
+	log.Fatal(http.ListenAndServe(":8000", r))
 }

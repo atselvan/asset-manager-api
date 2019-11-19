@@ -6,6 +6,8 @@ github.com/atselvan/go-pgdb-lib v1.0.1 h1:f8O9Ybuehd5DHZoCozk6oPUaDtVm6ju0mFuF6p
 github.com/atselvan/go-pgdb-lib v1.0.1/go.mod h1:o9TNtIIW7Q58clkEi/jYNB6ROQRjcezfggsWCfbE4X8=
 github.com/atselvan/go-pgdb-lib v1.0.2 h1:IldZem5Au84LvFE8kO9jVWaQHZ48dhMg9Icx/AJ9NRI=
 github.com/atselvan/go-pgdb-lib v1.0.2/go.mod h1:AavvMeAgxsmVKzBZ6qrwAgKPkeBXX8F2sY/7oEaNb2k=
+github.com/atselvan/go-pgdb-lib v1.0.3 h1:BMtcLiha265tnf7EkZgJ0kSYFuKUDOh8QbVpn/2GKRY=
+github.com/atselvan/go-pgdb-lib v1.0.3/go.mod h1:H4tCWYVXXqeTAHmzueESWJlchFGW9CDM2Tg8UxyyCSU=
 github.com/atselvan/go-utils v0.0.0-20191116003038-b61b8b2f2445 h1:82JAQTTVzq6ptVeKXfduCi/mPaLRIUgHlGn6SQousoE=
 github.com/atselvan/go-utils v0.0.0-20191116003038-b61b8b2f2445/go.mod h1:QXn9ssQOBpnVWMqmaTAT1QAiHxt5xsPMh0uBEJfrFoQ=
 github.com/atselvan/go-utils v1.0.0 h1:r6JNPdtV9A4NCgnL1eZHOnOzupreCGyJHsIzMTMyKUQ=
@@ -16,6 +18,8 @@ github.com/atselvan/go-utils v1.0.2 h1:LMVSRJZWHWUi+bIse6HaUhHHefHRU6zm1/B7jZ1+i
 github.com/atselvan/go-utils v1.0.2/go.mod h1:QXn9ssQOBpnVWMqmaTAT1QAiHxt5xsPMh0uBEJfrFoQ=
 github.com/atselvan/go-utils v1.0.3 h1:KjKPPcFDrRMKjhDZK8Fc9irkrZ/UuPY2ZOlCLViUZ9E=
 github.com/atselvan/go-utils v1.0.3/go.mod h1:QXn9ssQOBpnVWMqmaTAT1QAiHxt5xsPMh0uBEJfrFoQ=
+github.com/atselvan/go-utils v1.0.4 h1:d336cTbPblXDunB76wthyVl8ZtR98mRZ/Evv6syOUFc=
+github.com/atselvan/go-utils v1.0.4/go.mod h1:QXn9ssQOBpnVWMqmaTAT1QAiHxt5xsPMh0uBEJfrFoQ=
 github.com/gorilla/mux v1.7.3 h1:gnP5JzjVOuiZD07fKKToCAOjS0yOpj/qPETTXCCS6hw=
 github.com/gorilla/mux v1.7.3/go.mod h1:1lud6UwP+6orDFRuTfBEV8e9/aOM/c4fVVCaMa2zaAs=
 github.com/lib/pq v1.2.0 h1:LXpIM/LZ5xGFhOpXAQUIMM1HdyqzVYM13zNdjCEEcA0=

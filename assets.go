@@ -52,7 +52,7 @@ func (a *Asset) isValidAssetCategory() error {
 		return err
 	}
 	if !utils.EntryExists(e.Values, a.Category) {
-		return utils.Error{ErrMsg: fmt.Sprintf(assetCategoryNotFoundStr, a.Category, utils.GetSliceAsCommaSeparatedString(e.Values))}.NewError()
+		return utils.Error{ErrMsg: fmt.Sprintf(assetCategoryNotFoundStr, a.Category, e.Values)}.NewError()
 	}
 	return nil
 }
@@ -68,7 +68,7 @@ func (a *Asset) isValidAssetType() error {
 		return err
 	}
 	if !utils.EntryExists(e.Values, a.Ctype) {
-		return utils.Error{ErrMsg: fmt.Sprintf(assetTypeNotFoundStr, a.Ctype, utils.GetSliceAsCommaSeparatedString(e.Values))}.NewError()
+		return utils.Error{ErrMsg: fmt.Sprintf(assetTypeNotFoundStr, a.Ctype, e.Values)}.NewError()
 	}
 	return nil
 }
@@ -84,7 +84,7 @@ func (a *Asset) isValidAssetBrand() error {
 		return err
 	}
 	if !utils.EntryExists(e.Values, a.Brand) {
-		return utils.Error{ErrMsg: fmt.Sprintf(assetBrandNotFoundStr, a.Brand, utils.GetSliceAsCommaSeparatedString(e.Values))}.NewError()
+		return utils.Error{ErrMsg: fmt.Sprintf(assetBrandNotFoundStr, a.Brand, e.Values)}.NewError()
 	}
 	return nil
 }
@@ -154,7 +154,7 @@ func (a *Asset) isValidAssetStatus() error {
 		return err
 	}
 	if !utils.EntryExists(e.Values, a.Status) {
-		return utils.Error{ErrMsg: fmt.Sprintf(assetStatusNotFoundStr, a.Status, utils.GetSliceAsCommaSeparatedString(e.Values))}.NewError()
+		return utils.Error{ErrMsg: fmt.Sprintf(assetStatusNotFoundStr, a.Status, e.Values)}.NewError()
 	}
 	return nil
 }
